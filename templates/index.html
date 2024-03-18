@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Checker</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        text-align: center;
+        margin-top: 20px;
+      }
+      form {
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+      textarea,
+      input[type="text"] {
+        width: calc(100% - 10px);
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      input[type="submit"] {
+        width: 100%;
+        background-color: #4caf50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      input[type="submit"]:hover {
+        background-color: #45a049;
+      }
+      #results {
+        margin-top: 20px;
+        border-collapse: collapse;
+        width: 100%;
+      }
+      #results th,
+      #results td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+      }
+      #results th {
+        background-color: #4caf50;
+        color: white;
+      }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <h1>URL Checker</h1>
+    <form id="urlForm">
+      <label for="url">Enter URL(s):</label>
+      <textarea name="url" id="url" rows="5" cols="50" required></textarea
+      ><br />
+      <label for="keywords">Enter Keywords (comma-separated):</label>
+      <input type="text" name="keywords" id="keywords" required /><br />
+      <input type="submit" value="Check URLs" />
+    </form>
+    <table id="results">
+      <thead>
+        <tr>
+          <th>Website</th>
+          <th>Website Available</th>
+          <th>Keyword Present</th>
+          <th>Comments</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody">
+        {% for result in results %}
+        <tr>
+          <td>{{ result.url }}</td>
+          <td>{{ "TRUE" if result.website_available else "FALSE" }}</td>
+          <td>{{ "TRUE" if result.keyword_present else "FALSE" }}</td>
+          <td>{{ result.comments }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <script>
+      $(document).ready(function () {
+        $("#urlForm").submit(function (event) {
+          event.preventDefault();
+          var formData = $(this).serializeArray();
+          var urls = formData[0].value.split("\n").filter(function (url) {
+            return url.trim() !== "";
+          });
+          var keyword = formData[1].value.trim(); // Get the keyword once
+
+          urls.forEach(function (url) {
+            $.ajax({
+              type: "POST",
+              url: "/",
+              data: { url: url.trim(), keyword: keyword },
+              success: function (results) {
+                var result = results[0]; // Get the first element
+                var websiteAvailable =
+                  result.status_code === 200 ? "TRUE" : "FALSE";
+                var keywordPresent = result.keyword_found ? "TRUE" : "FALSE";
+                var comments =
+                  result.status_code === 200
+                    ? ""
+                    : "Status Code: " + result.status_code;
+                $("#resultsBody").append(
+                  "<tr><td>" +
+                    result.url +
+                    "</td><td>" +
+                    websiteAvailable +
+                    "</td><td>" +
+                    keywordPresent +
+                    "</td><td>" +
+                    comments +
+                    "</td></tr>"
+                );
+              },
+
+              error: function (xhr, status, error) {
+                console.error(error);
+                $("#resultsBody").append(
+                  "<tr><td>" +
+                    url +
+                    "</td><td>FALSE</td><td>FALSE</td><td>Error</td></tr>"
+                );
+              },
+            });
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
