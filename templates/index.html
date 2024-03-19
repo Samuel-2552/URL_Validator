@@ -68,11 +68,27 @@
         background-color: #4caf50;
         color: white;
       }
+      #downloadExcel {
+        display: none; /* Initially hide the download button */
+        width: 100%;
+        background-color: #008cba;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      #downloadExcel:hover {
+        background-color: #005f6b;
+      }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   </head>
   <body>
-    <h1>URL Checker</h1>
+    <h1>URL Validator</h1>
     <form id="urlForm">
       <label for="url">Enter URL(s):</label>
       <textarea name="url" id="url" rows="5" cols="50" required></textarea
@@ -84,23 +100,16 @@
     <table id="results">
       <thead>
         <tr>
+          <th>Sl No:</th>
           <th>Website</th>
           <th>Website Available</th>
           <th>Keyword Present</th>
           <th>Comments</th>
         </tr>
       </thead>
-      <tbody id="resultsBody">
-        {% for result in results %}
-        <tr>
-          <td>{{ result.url }}</td>
-          <td>{{ "TRUE" if result.website_available else "FALSE" }}</td>
-          <td>{{ "TRUE" if result.keyword_present else "FALSE" }}</td>
-          <td>{{ result.comments }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
+      <tbody id="resultsBody"></tbody>
     </table>
+    <button id="downloadExcel">Download Excel</button>
     <script>
       $(document).ready(function () {
         $("#urlForm").submit(function (event) {
@@ -110,6 +119,8 @@
             return url.trim() !== "";
           });
           var keyword = formData[1].value.trim(); // Get the keyword once
+          var serialNumber = 1; // Initialize serial number
+          var allResults = [];
 
           urls.forEach(function (url) {
             $.ajax({
@@ -124,11 +135,16 @@
                 var comments =
                   result.status_code === 200
                     ? ""
-                    : "Status Code: " + result.status_code;
+                    : getStatusMessage(result.status_code);
+
                 $("#resultsBody").append(
                   "<tr><td>" +
+                    serialNumber++ +
+                    "</td><td><a href='" +
                     result.url +
-                    "</td><td>" +
+                    "' target='_blank'>" +
+                    result.url +
+                    "</a></td><td>" +
                     websiteAvailable +
                     "</td><td>" +
                     keywordPresent +
@@ -136,17 +152,95 @@
                     comments +
                     "</td></tr>"
                 );
-              },
 
+                allResults.push({
+                  "Sl No": serialNumber - 1,
+                  Website: result.url,
+                  "Website Available": websiteAvailable,
+                  "Keyword Present": keywordPresent,
+                  Comments: comments,
+                });
+
+                // Scroll to the bottom of the page
+                $("html, body").scrollTop($(document).height());
+
+                // Show the download button when all results are added
+                if (allResults.length === urls.length) {
+                  $("#downloadExcel").show();
+                }
+              },
               error: function (xhr, status, error) {
                 console.error(error);
                 $("#resultsBody").append(
                   "<tr><td>" +
+                    serialNumber++ + // Increment serial number for each row
+                    "</td><td>" +
                     url +
                     "</td><td>FALSE</td><td>FALSE</td><td>Error</td></tr>"
                 );
+
+                allResults.push({
+                  "Sl No": serialNumber - 1,
+                  Website: url,
+                  "Website Available": "FALSE",
+                  "Keyword Present": "FALSE",
+                  Comments: "Error",
+                });
+
+                // Scroll to the bottom of the page
+                $("html, body").scrollTop($(document).height());
+
+                // Show the download button when all results are added
+                if (allResults.length === urls.length) {
+                  $("#downloadExcel").show();
+                }
               },
             });
+          });
+
+          // Function to get status message based on status code
+          function getStatusMessage(statusCode) {
+            switch (statusCode) {
+              case 400:
+                return "Bad Request: The server could not understand the request due to invalid syntax.";
+              case 401:
+                return "Unauthorized: The client must authenticate itself to get the requested response.";
+              case 403:
+                return "Forbidden: The server understood the request, but refuses to authorize it.";
+              case 404:
+                return "Not Found: The server has not found anything matching the requested URL.";
+              case 500:
+                return "Internal Server Error: The server encountered an unexpected condition that prevented it from fulfilling the request.";
+              default:
+                return "Status Code: " + statusCode;
+            }
+          }
+
+          // Download Excel
+          $("#downloadExcel").click(function () {
+            const wb = XLSX.utils.book_new();
+            wb.Props = {
+              Title: "URL Checker Results",
+              Author: "Your Name",
+              CreatedDate: new Date(),
+            };
+            wb.SheetNames.push("Results");
+            const ws = XLSX.utils.json_to_sheet(allResults);
+            wb.Sheets["Results"] = ws;
+            const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+
+            function s2ab(s) {
+              var buf = new ArrayBuffer(s.length);
+              var view = new Uint8Array(buf);
+              for (var i = 0; i < s.length; i++)
+                view[i] = s.charCodeAt(i) & 0xff;
+              return buf;
+            }
+
+            saveAs(
+              new Blob([s2ab(wbout)], { type: "application/octet-stream" }),
+              "url_checker_results.xlsx"
+            );
           });
         });
       });

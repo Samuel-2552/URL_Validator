@@ -14,7 +14,8 @@ def validate_url(url):
 
 def check_keyword(url, keywords):
     try:
-        response = requests.get(url)
+        response = requests.get(url, verify=False, timeout=30, headers={
+                                'User-Agent': 'Mozilla/5.0'}, stream=True)
         status_code = response.status_code
         keyword_found = False
         if status_code == 200:
