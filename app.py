@@ -14,7 +14,7 @@ def validate_url(url):
 
 def check_keyword(url, keywords):
     try:
-        response = requests.get(url, verify=False, timeout=30, headers={
+        response = requests.get(url, allow_redirects=True, verify=True, timeout=30, headers={
                                 'User-Agent': 'Mozilla/5.0'}, stream=True)
         status_code = response.status_code
         keyword_found = False
@@ -54,4 +54,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run('0.0.0.0', debug=True)
