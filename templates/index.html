@@ -3,7 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>URL Checker</title>
+    <title>URL Validator</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
@@ -82,12 +86,34 @@
       #downloadExcel:hover {
         background-color: #005f6b;
       }
+
+      .icon-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        background-color: #007bff; /* Adjust the background color as needed */
+        border-radius: 50%; /* This creates the circle */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* Styling for Font Awesome icon */
+      .icon-container i {
+        font-size: 24px; /* Adjust the icon size as needed */
+        color: white; /* Adjust the icon color as needed */
+      }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   </head>
   <body>
+    <div class="icon-container">
+      <a href="#"><i class="fas fa-info-circle"></i></a>
+    </div>
     <h1>URL Validator</h1>
     <form id="urlForm">
       <label for="url">Enter URL(s):</label>
