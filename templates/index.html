@@ -1,281 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>URL Validator</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
-    />
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f2f2f2;
-        margin: 0;
-        padding: 0;
-      }
-      h1 {
-        text-align: center;
-        margin-top: 20px;
-      }
-      form {
-        max-width: 600px;
-        margin: 0 auto;
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-      label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-      }
-      textarea,
-      input[type="text"] {
-        width: calc(100% - 10px);
-        padding: 10px;
-        margin-bottom: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-      }
-      input[type="submit"] {
-        width: 100%;
-        background-color: #4caf50;
-        color: white;
-        padding: 14px 20px;
-        margin: 8px 0;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-      input[type="submit"]:hover {
-        background-color: #45a049;
-      }
-      #results {
-        margin-top: 20px;
-        border-collapse: collapse;
-        width: 100%;
-      }
-      #results th,
-      #results td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-      }
-      #results th {
-        background-color: #4caf50;
-        color: white;
-      }
-      #downloadExcel {
-        display: none; /* Initially hide the download button */
-        width: 100%;
-        background-color: #008cba;
-        color: white;
-        padding: 14px 20px;
-        margin: 8px 0;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-      #downloadExcel:hover {
-        background-color: #005f6b;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>URL Validator</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css"
+  />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+    form {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    textarea,
+    input[type="text"] {
+      width: calc(100% - 10px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    input[type="submit"] {
+      width: 100%;
+      background-color: #4caf50;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+    #results {
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    #results th,
+    #results td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    #results th {
+      background-color: #4caf50;
+      color: white;
+    }
+    #downloadExcel {
+      display: none; /* Initially hide the download button */
+      width: 100%;
+      background-color: #008cba;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #downloadExcel:hover {
+      background-color: #005f6b;
+    }
 
-      .icon-container {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
-        background-color: #007bff; /* Adjust the background color as needed */
-        border-radius: 50%; /* This creates the circle */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+    .icon-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background-color: #007bff; /* Adjust the background color as needed */
+      border-radius: 50%; /* This creates the circle */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-      /* Styling for Font Awesome icon */
-      .icon-container i {
-        font-size: 24px; /* Adjust the icon size as needed */
-        color: white; /* Adjust the icon color as needed */
-      }
-    </style>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  </head>
-  <body>
-    <div class="icon-container">
-      <a href="https://url.securin.me"><i class="fas fa-info-circle"></i></a>
-    </div>
-    <h1>URL Validator</h1>
-    <form id="urlForm">
-      <label for="url">Enter URL(s):</label>
-      <textarea name="url" id="url" rows="5" cols="50" required></textarea
-      ><br />
-      <label for="keywords">Enter Keywords (comma-separated):</label>
-      <input
-        type="text"
-        name="keywords"
-        id="keywords"
-        required
-        placeholder="login,signup"
-      /><br />
-      <input type="submit" value="Check URLs" />
-    </form>
-    <table id="results">
-      <thead>
-        <tr>
-          <th>Sl No:</th>
-          <th>Website</th>
-          <th>Website Available</th>
-          <th>Keyword Present</th>
-          <th>Comments</th>
-        </tr>
-      </thead>
-      <tbody id="resultsBody"></tbody>
-    </table>
-    <button id="downloadExcel">Download Excel</button>
-    <script>
-      $(document).ready(function () {
-        $("#urlForm").submit(function (event) {
-          event.preventDefault();
-          var formData = $(this).serializeArray();
-          var urls = formData[0].value.split("\n").filter(function (url) {
-            return url.trim() !== "";
+    /* Styling for Font Awesome icon */
+    .icon-container i {
+      font-size: 24px; /* Adjust the icon size as needed */
+      color: white; /* Adjust the icon color as needed */
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+  <div class="icon-container">
+    <a href="https://url.securin.me"><i class="fas fa-info-circle"></i></a>
+  </div>
+  <h1>URL Validator</h1>
+  <form id="urlForm">
+    <label for="url">Enter URL(s):</label>
+    <textarea name="url" id="url" rows="5" cols="50" required></textarea><br />
+    <label for="keywords">Enter Keywords (comma-separated):</label>
+    <input type="text" name="keywords" id="keywords" required placeholder="login,signup" /><br />
+    <label for="depth">Crawl Depth</label>
+    <input type="number" name="depth" id="depth" required placeholder="Valid Range from 0-20" /><br />
+    <input type="submit" value="Check URLs" />
+  </form>
+  <table id="results">
+    <thead>
+      <tr>
+        <th>Sl No:</th>
+        <th>Website</th>
+        <th>Website Available</th>
+        <th>Keyword Present</th>
+        <th>Comments</th>
+      </tr>
+    </thead>
+    <tbody id="resultsBody"></tbody>
+  </table>
+  <button id="downloadExcel">Download Excel</button>
+ 
+  <script>
+    $(document).ready(function () {
+  $("#urlForm").submit(function (event) {
+    event.preventDefault();
+    
+    var formData = $(this).serializeArray();
+    var urls = formData[0].value.trim().split('\n'); // Split URLs by newline
+    var keywords = formData[1].value.trim();
+    var depth = formData[2].value;
+    var serialNumber = 1; // Initialize serial number
+    var allResults = [];
+
+    // Clear previous results
+    $("#resultsBody").empty();
+    $("#downloadExcel").hide();
+
+    // Iterate over each URL and send a request
+    urls.forEach(function (url) {
+      var eventSource = new EventSource(`/stream?url=${url}&keywords=${keywords}&depth=${depth}`);
+      
+      eventSource.onmessage = function (event) {
+        var result = JSON.parse(event.data);
+        if (result.done) {
+          eventSource.close();
+          allResults.push({
+            "Sl No": serialNumber,
+            Website: result.url,
+            "Website Available": result.status_code === 200 ? "Yes" : "No",
+            "Keyword Present": result.keyword_found ? "Yes" : "No",
+            Comments: result.keyword_found ? "Keyword found" : "Keyword not found",
           });
-          var keyword = formData[1].value.trim(); // Get the keyword once
-          var serialNumber = 1; // Initialize serial number
-          var allResults = [];
-
-          urls.forEach(function (url) {
-            $.ajax({
-              type: "POST",
-              url: "/",
-              data: { url: url.trim(), keyword: keyword },
-              success: function (results) {
-                var result = results[0]; // Get the first element
-                var websiteAvailable =
-                  result.status_code === 200 ? "TRUE" : "FALSE";
-                var keywordPresent = result.keyword_found ? "TRUE" : "FALSE";
-                var comments =
-                  result.status_code === 200
-                    ? ""
-                    : getStatusMessage(result.status_code);
-
-                $("#resultsBody").append(
-                  "<tr><td>" +
-                    serialNumber++ +
-                    "</td><td><a href='" +
-                    result.url +
-                    "' target='_blank'>" +
-                    result.url +
-                    "</a></td><td>" +
-                    websiteAvailable +
-                    "</td><td>" +
-                    keywordPresent +
-                    "</td><td>" +
-                    comments +
-                    "</td></tr>"
-                );
-
-                allResults.push({
-                  "Sl No": serialNumber - 1,
-                  Website: result.url,
-                  "Website Available": websiteAvailable,
-                  "Keyword Present": keywordPresent,
-                  Comments: comments,
-                });
-
-                // Scroll to the bottom of the page
-                $("html, body").scrollTop($(document).height());
-
-                // Show the download button when all results are added
-                if (allResults.length === urls.length) {
-                  $("#downloadExcel").show();
-                }
-              },
-              error: function (xhr, status, error) {
-                console.error(error);
-                $("#resultsBody").append(
-                  "<tr><td>" +
-                    serialNumber++ + // Increment serial number for each row
-                    "</td><td>" +
-                    url +
-                    "</td><td>FALSE</td><td>FALSE</td><td>Error</td></tr>"
-                );
-
-                allResults.push({
-                  "Sl No": serialNumber - 1,
-                  Website: url,
-                  "Website Available": "FALSE",
-                  "Keyword Present": "FALSE",
-                  Comments: "Error",
-                });
-
-                // Scroll to the bottom of the page
-                $("html, body").scrollTop($(document).height());
-
-                // Show the download button when all results are added
-                if (allResults.length === urls.length) {
-                  $("#downloadExcel").show();
-                }
-              },
-            });
-          });
-
-          // Function to get status message based on status code
-          function getStatusMessage(statusCode) {
-            switch (statusCode) {
-              case 400:
-                return "Bad Request: The server could not understand the request due to invalid syntax.";
-              case 401:
-                return "Unauthorized: The client must authenticate itself to get the requested response.";
-              case 403:
-                return "Forbidden: The server understood the request, but refuses to authorize it.";
-              case 404:
-                return "Not Found: The server has not found anything matching the requested URL.";
-              case 500:
-                return "Internal Server Error: The server encountered an unexpected condition that prevented it from fulfilling the request.";
-              default:
-                return "Status Code: " + statusCode;
-            }
+          serialNumber++;
+          if (serialNumber > urls.length) {
+            $("#downloadExcel").show();
           }
+          return;
+        }
 
-          // Download Excel
-          $("#downloadExcel").click(function () {
-            const wb = XLSX.utils.book_new();
-            wb.Props = {
-              Title: "URL Checker Results",
-              Author: "Your Name",
-              CreatedDate: new Date(),
-            };
-            wb.SheetNames.push("Results");
-            const ws = XLSX.utils.json_to_sheet(allResults);
-            wb.Sheets["Results"] = ws;
-            const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+        var websiteAvailable = result.status_code === 200 ? "Yes" : "No";
+        var keywordPresent = result.keyword_found ? "Yes" : "No";
+        var comments = result.keyword_found ? "Keyword found" : "Keyword not found";
 
-            function s2ab(s) {
-              var buf = new ArrayBuffer(s.length);
-              var view = new Uint8Array(buf);
-              for (var i = 0; i < s.length; i++)
-                view[i] = s.charCodeAt(i) & 0xff;
-              return buf;
-            }
+        $("#resultsBody").append(
+          "<tr><td>" +
+            serialNumber++ +
+            "</td><td><a href='" +
+            result.url +
+            "' target='_blank'>" +
+            result.url +
+            "</a></td><td>" +
+            websiteAvailable +
+            "</td><td>" +
+            keywordPresent +
+            "</td><td>" +
+            comments +
+            "</td></tr>"
+        );
 
-            saveAs(
-              new Blob([s2ab(wbout)], { type: "application/octet-stream" }),
-              "url_checker_results.xlsx"
-            );
-          });
+        allResults.push({
+          "Sl No": serialNumber,
+          Website: result.url,
+          "Website Available": websiteAvailable,
+          "Keyword Present": keywordPresent,
+          Comments: comments,
         });
-      });
-    </script>
-  </body>
+
+        // Scroll to the bottom of the page
+        $("html, body").scrollTop($(document).height());
+      };
+
+      eventSource.onerror = function (event) {
+        eventSource.close();
+        var statusCode = event.target.readyState;
+        var statusMessage = getStatusMessage(statusCode);
+        var errorRow = "<tr><td>" + serialNumber++ + "</td><td>" + url + "</td><td>Not Available</td><td>N/A</td><td>" + statusMessage + "</td></tr>";
+        $("#resultsBody").append(errorRow);
+        allResults.push({
+          "Sl No": serialNumber,
+          Website: url,
+          "Website Available": "No",
+          "Keyword Present": "N/A",
+          Comments: statusMessage,
+        });
+        serialNumber++;
+        if (serialNumber > urls.length) {
+          $("#downloadExcel").show();
+        }
+      };
+    });
+
+    // Function to get status message based on status code
+    function getStatusMessage(statusCode) {
+      switch (statusCode) {
+        case 400:
+          return "Bad Request: The server could not understand the request due to invalid syntax.";
+        case 401:
+          return "Unauthorized: The client must authenticate itself to get the requested response.";
+        case 403:
+          return "Forbidden: The server understood the request, but refuses to authorize it.";
+        case 404:
+          return "Not Found: The server has not found anything matching the requested URL.";
+        case 500:
+          return "Internal Server Error: The server encountered an unexpected condition that prevented it from fulfilling the request.";
+        default:
+          return "Status Code: " + statusCode;
+      }
+    }
+
+    // Download Excel
+    $("#downloadExcel").click(function () {
+      const wb = XLSX.utils.book_new();
+      wb.Props = {
+        Title: "URL Checker Results",
+        Author: "Your Name",
+        CreatedDate: new Date(),
+      };
+      wb.SheetNames.push("Results");
+      const ws = XLSX.utils.json_to_sheet(allResults);
+      wb.Sheets["Results"] = ws;
+      const wbout = XLSX.write(wb, { bookType: "xlsx", type: "binary" });
+
+      function s2ab(s) {
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xff;
+        return buf;
+      }
+
+      saveAs(
+        new Blob([s2ab(wbout)], { type: "application/octet-stream" }),
+        "url_checker_results.xlsx"
+      );
+    });
+  });
+});
+
+  </script>
+</body>
 </html>
