@@ -128,6 +128,7 @@
     <thead>
       <tr>
         <th>Sl No:</th>
+        <th>Application Name:</th>
         <th>Website</th>
         <th>Website Available</th>
         <th>Keyword Present</th>
@@ -137,7 +138,25 @@
     <tbody id="resultsBody"></tbody>
   </table>
   <button id="downloadExcel">Download Excel</button>
- 
+ <script>
+  let usedSerialNumbers = new Set();
+
+// Function to get the next available serial number
+function getNextSerialNumber(serialNumber) {
+    let currentSerialNumber = serialNumber;
+    let suffix = 0;
+
+    // Check if the current serial number is in the set
+    while (usedSerialNumbers.has(currentSerialNumber)) {
+        suffix += 1;
+        currentSerialNumber = `${serialNumber}.${suffix}`;
+    }
+
+    // Add the new serial number to the set
+    usedSerialNumbers.add(currentSerialNumber);
+    return currentSerialNumber;
+}
+ </script>
   <script>
     $(document).ready(function () {
   $("#urlForm").submit(function (event) {
@@ -162,14 +181,15 @@
         var result = JSON.parse(event.data);
         if (result.done) {
           eventSource.close();
-          allResults.push({
-            "Sl No": serialNumber,
-            Website: result.url,
-            "Website Available": result.status_code === 200 ? "Yes" : "No",
-            "Keyword Present": result.keyword_found ? "Yes" : "No",
-            Comments: result.keyword_found ? "Keyword found" : "Keyword not found",
-          });
-          serialNumber++;
+          // allResults.push({
+          //   "Sl No": serialNumber,
+          //   "Application Name": result.title,
+          //   Website: result.url,
+          //   "Website Available": result.status_code === 200 ? "Yes" : "No",
+          //   "Keyword Present": result.keyword_found ? "Yes" : "No",
+          //   Comments: result.keyword_found ? result.keyword_found : getStatusMessage(result.status_code),
+          // });
+          serialNumber;
           if (serialNumber > urls.length) {
             $("#downloadExcel").show();
           }
@@ -178,11 +198,13 @@
 
         var websiteAvailable = result.status_code === 200 ? "Yes" : "No";
         var keywordPresent = result.keyword_found ? "Yes" : "No";
-        var comments = result.keyword_found ? "Keyword found" : "Keyword not found";
+        var comments = result.keyword_found ? result.keyword_found : getStatusMessage(result.status_code);
 
         $("#resultsBody").append(
           "<tr><td>" +
             serialNumber++ +
+            "</td><td>"+
+              result.title +
             "</td><td><a href='" +
             result.url +
             "' target='_blank'>" +
@@ -198,6 +220,7 @@
 
         allResults.push({
           "Sl No": serialNumber,
+          "Application Name": result.title,
           Website: result.url,
           "Website Available": websiteAvailable,
           "Keyword Present": keywordPresent,
@@ -216,12 +239,13 @@
         $("#resultsBody").append(errorRow);
         allResults.push({
           "Sl No": serialNumber,
+          "Application Name": result.title,
           Website: url,
           "Website Available": "No",
           "Keyword Present": "N/A",
           Comments: statusMessage,
         });
-        serialNumber++;
+        serialNumber;
         if (serialNumber > urls.length) {
           $("#downloadExcel").show();
         }
@@ -251,7 +275,7 @@
       const wb = XLSX.utils.book_new();
       wb.Props = {
         Title: "URL Checker Results",
-        Author: "Your Name",
+        Author: "Samuel Joseph",
         CreatedDate: new Date(),
       };
       wb.SheetNames.push("Results");

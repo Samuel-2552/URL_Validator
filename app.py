@@ -21,15 +21,27 @@ def check_keyword(url, keywords):
 
         if status_code == 200:
             content = response.text.lower()
+            # print(content)
             for keyword in keywords:
                 if keyword.strip().lower() in content:
-                    keyword_found = True
-                    break
+                    keyword_found = keyword
 
-        return {'url': url, 'status_code': status_code, 'keyword_found': keyword_found}
+                    break
+            # Parse the HTML content with BeautifulSoup
+            soup = BeautifulSoup(content, 'html.parser')
+            
+            # Extract the title of the page
+            title_tag = soup.find('title')
+            if title_tag:
+                title = title_tag.get_text()
+            else:
+                title="Null"
+        else:
+            title = "Null"
+        return {'url': url, 'status_code': status_code, 'keyword_found': keyword_found, 'title': title}
 
     except requests.exceptions.RequestException as e:
-        return {'url': url, 'status_code': str(e), 'keyword_found': False}
+        return {'url': url, 'status_code': str(e), 'keyword_found': False, 'title': "Null"}
 
 def crawl_and_check_keywords(url, keywords, depth):
     visited_links = set()
